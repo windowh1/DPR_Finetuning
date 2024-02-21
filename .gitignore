@@ -66,3 +66,4 @@ DPR/downloads/data/retriever_results/nq/single/wikipedia_passages_49.pkl
 DPR/downloads/data/wikipedia_split/psgs_w100.tsv
 myCode/practice.ipynb
 myCode/data
+DPR/bm25_v2.py
