@@ -1,3 +1,6 @@
+import sys
+sys.path.append('./DPR')
+
 import csv
 import json
 import pandas as pd
@@ -48,7 +51,7 @@ def count_true_retrieval(retrieval_result, training_set_index, top_k=100, true_p
     for i in range(len(cnt_list)):
         cnt_list_csv[i][0] = cnt_list[i]
 
-    with open(path.MYCODE_DATA + 'true_retrieval_count_top_' + str(top_k) + '_true_psg_' + str(true_passages_num) + '.csv', 'w') as f:
+    with open(path.MY_DATA + 'true_retrieval_count_top_' + str(top_k) + '_true_psg_' + str(true_passages_num) + '.csv', 'w') as f:
         writer = csv.writer(f)
         writer.writerows(cnt_list_csv)
     
@@ -58,7 +61,7 @@ def count_true_retrieval(retrieval_result, training_set_index, top_k=100, true_p
 # training_set filtering & hard_negative_ctxs 갈음
 def filtering_training_set(training_set, retrieval_result, training_set_index, top_k=100, true_passages_num=0):
     
-    cnt_list = pd.read_csv(path.MYCODE_DATA + 'true_retrieval_count_top_' + str(top_k) + '_true_psg_' + str(true_passages_num) + '.csv', header=None)[0].to_list()
+    cnt_list = pd.read_csv(path.MY_DATA + 'true_retrieval_count_top_' + str(top_k) + '_true_psg_' + str(true_passages_num) + '.csv', header=None)[0].to_list()
     min_num_hard_neg = 100 # training_set(original)에서 retrieve한 passage 개수
 
     new_training_set = []
@@ -80,7 +83,7 @@ def filtering_training_set(training_set, retrieval_result, training_set_index, t
             new_training_set.append(training_set[j])
             new_training_set[-1]["hard_negative_ctxs"] = hard_negative_ctxs
             
-    with open(path.MYCODE_DATA + 'train_filtered' + '_top_' + str(top_k) + '_true_psg_' + str(true_passages_num) + '.json', 'w') as f:
+    with open(path.MY_DATA + 'train_filtered' + '_top_' + str(top_k) + '_true_psg_' + str(true_passages_num) + '.json', 'w') as f:
         json.dump(new_training_set, f, indent=4)
     
     return min_num_hard_neg # 가장 작은 hard negative ctxs 수

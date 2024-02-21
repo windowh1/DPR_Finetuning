@@ -1,3 +1,6 @@
+import sys
+sys.path.append('./DPR')
+
 import csv
 import json
 import pandas as pd
@@ -21,7 +24,7 @@ training_set_index_csv = [[0] for _ in range(len(training_set_index))]
 for i in range(len(training_set_index)):
     training_set_index_csv[i][0] = training_set_index[i]
 
-with open(path.MYCODE_DATA + 'training_set_index.csv', 'w') as f:
+with open(path.MY_DATA + 'training_set_index.csv', 'w') as f:
     writer = csv.writer(f)
     writer.writerows(training_set_index_csv)
 

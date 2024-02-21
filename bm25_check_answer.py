@@ -1,3 +1,6 @@
+import sys
+sys.path.append('./DPR')
+
 import csv
 from functools import partial
 import json
@@ -145,7 +148,7 @@ def get_all_passages(ctx_sources):
 
 
 
-@hydra.main(config_path="conf", config_name="dense_retriever")
+@hydra.main(config_path="DPR/conf", config_name="dense_retriever")
 def main(cfg: DictConfig):
 
     logger.info("%s", OmegaConf.to_yaml(cfg))

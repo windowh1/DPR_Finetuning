@@ -1,3 +1,6 @@
+import sys
+sys.path.append('./DPR')
+
 import csv
 from joblib import Parallel, delayed
 import numpy as np
@@ -109,7 +112,7 @@ def process_query(query, bm25, k=100):
     return top_ctx_idx + 1
 
 
-@hydra.main(config_path="conf", config_name="gen_embs")
+@hydra.main(config_path="DPR/conf", config_name="gen_embs")
 def main(cfg: DictConfig):
 
     tensorizer = get_bert_tensorizer_bm25(cfg)    
