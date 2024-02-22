@@ -1,0 +1,20 @@
+defaults:
+  - encoder: hf_bert
+  - ctx_sources: default_sources
+
+# Name of the all-passages resource
+ctx_src: dpr_wiki
+
+# output .tsv file path to write results to
+out_file:
+
+# Whether to lower case the input text. Set True for uncased models, False for the cased ones.
+do_lower_case: True
+
+# tokens which won't be slit by tokenizer
+special_tokens:
+
+# # of cpu core
+cpu_per_tasks: 8
+
+batch_size: 32
