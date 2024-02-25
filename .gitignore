@@ -4,3 +4,6 @@ myData/
 outputs/
 tmp/
 utils/
+_result
+_resulterr
+_run.sh

@@ -1,12 +1,12 @@
 import sys
 sys.path.append('./DPR')
 
-import csv
 from functools import partial
 import json
 import logging
 from multiprocessing import Pool as ProcessPool
-from typing import Tuple, List, Dict
+import pickle
+from typing import List, Dict
 
 import hydra
 from omegaconf import DictConfig, OmegaConf
@@ -24,13 +24,13 @@ def check_answer_from_meta(
     match_type,
 ) -> List[bool]:
 
-    answers, (docs_meta, docs_score) = answers_and_docs
+    answers, docs = answers_and_docs
 
     hits = []
 
-    for doc_meta in docs_meta:
+    for doc in docs:
         answer_found = False
-        if has_answer(answers, doc_meta, tokenizer, match_type):
+        if has_answer(answers, doc["contents"], tokenizer, match_type):
             answer_found = True
         hits.append(answer_found)
     return hits
@@ -38,7 +38,7 @@ def check_answer_from_meta(
 
 def calculate_matches_from_meta(
     answers_list: List[List[str]], 
-    top_docs_and_scores_list: List[Tuple[List[str], List[float]]],
+    top_docs_list: List[List[Dict]],
     workers_num: int,
     match_type: str,
 ) -> List[List[bool]]:
@@ -54,7 +54,7 @@ def calculate_matches_from_meta(
         match_type=match_type,
     )
 
-    answers_and_docs_list = zip(answers_list, top_docs_and_scores_list)
+    answers_and_docs_list = zip(answers_list, top_docs_list)
     hits_list = processes.map(get_hits_partial, answers_and_docs_list)
     logger.info("Per question validation results len=%d", len(hits_list))
 
@@ -64,7 +64,7 @@ def calculate_matches_from_meta(
 def save_results_from_meta(
     questions: List[str],
     answers_list: List[List[str]],
-    top_docs_and_scores_list: List[Tuple[List[str], List[float]]],
+    top_docs_list: List[List[Dict]],
     hits_list: List[List[bool]],
     out_file: str,
 ):
@@ -73,24 +73,21 @@ def save_results_from_meta(
     # assert len(per_question_hits) == len(questions) == len(answers)
     for i, q in enumerate(questions):
         answers = answers_list[i]
-        docs_and_scores = top_docs_and_scores_list[i]
+        top_docs = top_docs_list[i]
         hits = hits_list[i]
-        docs = [doc for doc in docs_and_scores[0]]
-        scores = [str(score) for score in docs_and_scores[1]]
-        ctxs_num = len(hits)
 
         results_item = {
             "question": q,
             "answers": answers,
             "ctxs": [
                 {
-                    # "id": docs[c][0],
-                    "title": None,
-                    "text": docs[c],
-                    "score": scores[c],
-                    "has_answer": hits[c],
+                    "id": doc["id"],
+                    "title": doc["titles"],
+                    "text": doc["contents"],
+                    "score": doc["scores"],
+                    "has_answer": hits[j],
                 }
-                for c in range(ctxs_num)
+                for j, doc in enumerate(top_docs)
             ],
         }
 
@@ -130,12 +127,12 @@ def main(cfg: DictConfig):
     logger.info("questions len %d", len(questions))
 
     # get top k results
-    top_docs_and_scores_list = []
+    with open(cfg.out_path + 'top_docs_list_top.pickle', 'rb') as f:
+        top_docs_list = pickle.load(f)
 
-    hits_list = calculate_matches_from_meta(answers_list, top_docs_and_scores_list, cfg.validation_workers, cfg.match)
+    hits_list = calculate_matches_from_meta(answers_list, top_docs_list, cfg.validation_workers, cfg.match)
 
-    save_results_from_meta(questions, answers_list, top_docs_and_scores_list, hits_list, cfg.out_file)
+    save_results_from_meta(questions, answers_list, top_docs_list, hits_list, cfg.out_path + 'retrieval_result_bm25')
         
 if __name__ == "__main__":
     main()
-

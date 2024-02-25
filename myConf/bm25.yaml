@@ -1,28 +1,27 @@
 defaults:
-  - encoder: hf_bert
-  - ctx_sources: default_sources
+  - datasets: retriever_default 
 
-# Name of the passages resource
-ctx_src: dpr_wiki
-
-# Name of the question&answer resource
+# Name of the question & answer resource
 qa_dataset: nq_train
 
-# output .tsv file path to write results to
-out_file:
+pyserini_index: 
 
-# Whether to lower case the input text. Set True for uncased models, False for the cased ones.
-do_lower_case: True
+# number of top(bottom)-k retrieval documents for each questions
+retrieve_num: 100
 
-# tokens which won't be slit by tokenizer
-special_tokens:
+# top or bottom-k retrieval
+mode: top
 
-# # of cpu core
-cpu_per_tasks: 8
+# output path to write results to
+out_path: 
 
-batch_size: 32
+# "regex" or "string"
+match: string
 
-num_shards:
+validation_workers: 1
 
-shard_id:
+training_set:
+
+retrieval_result_dpr: 
+
 
